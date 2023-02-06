@@ -1,0 +1,6 @@
+# Ignore files
+*.html
+*.xlsx
+*.txt
+*.csv
+*.rds

@@ -1,0 +1,13 @@
+*.RDS
+*.xlsx
+*.csv
+# History files
+.Rproj.user
+.Rhistory
+# Session Data files
+.RData
+# User-specific files
+.Ruserdata
+seccionado_2021
+IGRPOB_CCA_CAT__ETRS89_100_20200922_2019b
+Caps_de_municipi_de_Catalunya_georeferenciats.csv

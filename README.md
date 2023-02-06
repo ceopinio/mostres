@@ -1,14 +1,9 @@
-# Mostres
-Codi per extreure les mostres de les unitats primàries de mostreig (seccions censals) a les enquestes presencials del CEO.
+# Mostreig del Centre d'Estudis d'Opinió de la Generalitat de Catalunya
+Aquest respositori conté el codi del mostreig estadístic de les enquestes del Centre d'Estudis d'Opinió, CEO d'ara en endavant.
 
-El codi genera una mostra de seccions censals d'exemple. En ser una extracció aleatòria, NO és una extracció utilitzada en cap enquesta del CEO.
+## Estructura del repositori
 
-Definim les tipologies a partir de 6 clusters basats en els resultats de les darreres eleccions al Parlament.
+El mostreig de cada enquesta pot ser diferent segons els seu objectiu, és per això que es classificarà en carpetes el mostreig dels estudis que es facin.
 
-Extreiem una mostra estratificada per tipologia de secció censal. Cada secció té una probabilitat d'inclusió a la mostra proporcional a la seva mida.
+- `bop` conté el mostreig estadístic del Baròmetre d'Opinió Política (BOP), una enquesta de caràcter periòdic que té com a principal objectiu conèixer la percepció de la societat catalana sobre política, economia, mitjans de comunicació, comportament electoral i la valoració de líders polítics.
 
-El codi avalua la mostra, comparant-la amb la distribució de resultats electorals i característiques sociodemogràfiques.
-
-També representa la mostra en un mapa.
-
-També identifica les seccions adjacents que pertanyen al mateix cluster, que es poden emprar com a substitutes.
