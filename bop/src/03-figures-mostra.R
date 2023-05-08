@@ -12,9 +12,28 @@ for(i in 1:ncol(nom_mostra)) { # Using for-loop to add columns to list
 }
 N_random_mostres <- Map(cbind, N_random_mostres, nom_llista)
 
-# Ordenem el resultat final de puntuació de mostres i ens quedem amb NMILLORS
-nom_millors_mostres <- df_all[order(df_all$end_score_weights),]$id_mostra[1:NMILLORMOSTRES]
-millors_mostres <- N_random_mostres[nom_millors_mostres]
+# Ordenem el resultat final de puntuació de mostres i ens quedem amb NMILLORS, sempre que tinguin menys municipis que el màxim fixat
+resum_millors_mostres <- df_all %>% 
+  filter(distinct_municipis <= MAXIM_MUNICIPIS) %>% 
+  slice_max(order_by = desc(end_score_weights), n = NMILLORMOSTRES)
+  
+millors_mostres <- N_random_mostres[resum_millors_mostres$id_mostra]
+
+# Mirem repeticions de seccions censals entre les millors mostres
+# Ens quedem amb un data.frame amb variables d'interés que inclou les seccions de les millors mostres
+totes_seccions <- data.frame()
+for(i in 1:length(millors_mostres)){
+  aux <- as.data.frame(millors_mostres[[i]]) %>% 
+    dplyr::select(CUSEC, Cens, nom_municipi, nom_comarca, nom_provincia, cluster21, mostra)
+  totes_seccions <- rbind(totes_seccions, as.data.frame(aux))
+}
+# Mirem si hi ha repeticions
+repeticions <- totes_seccions %>% 
+  group_by(CUSEC) %>% 
+  filter(n() > 1) %>% 
+  ungroup()
+# Guardem un fitxer amb les repeticions entre les tres mostres escollides
+openxlsx::write.xlsx(repeticions, paste0(file.path(PROJECT, DTA_OUTPUT_FOLDER), "/repeticions.xlsx"))
 
 # Fitxer que necessita l'empresa per realitzar el treball de camp.
 # Es passa un forquilla del nombre d'entrevistes que han de fer.
@@ -27,8 +46,8 @@ openxlsx::write.xlsx( lapply(millors_mostres, function(x) filter(x, pob_municipi
                       paste0(file.path(PROJECT, DTA_OUTPUT_FOLDER), "/mostra_seccions_menys_10000_hab.xlsx") )
 
 # Fitxer dels resultats de la distibució dels partits i de les variables sociodemogràfiques pertinents de les mostres finals
-openxlsx::write.xlsx(ls_p_csample[nom_millors_mostres], paste0(file.path(PROJECT, DTA_OUTPUT_FOLDER), "/mostra_res_partits.xlsx"))
-openxlsx::write.xlsx(ls_sd_csample[nom_millors_mostres], paste0(file.path(PROJECT, DTA_OUTPUT_FOLDER), "/mostra_res_sociodemografiques.xlsx"))
+openxlsx::write.xlsx(ls_p_csample[resum_millors_mostres$id_mostra], paste0(file.path(PROJECT, DTA_OUTPUT_FOLDER), "/mostra_res_partits.xlsx"))
+openxlsx::write.xlsx(ls_sd_csample[resum_millors_mostres$id_mostra], paste0(file.path(PROJECT, DTA_OUTPUT_FOLDER), "/mostra_res_sociodemografiques.xlsx"))
 
 
 ## Mapa de les mostres guardades, un total de NMILLORSMOSTRES ----------------------------------------------------------
@@ -37,7 +56,7 @@ openxlsx::write.xlsx(ls_sd_csample[nom_millors_mostres], paste0(file.path(PROJEC
 unlink( paste0(file.path(PROJECT, DTA_OUTPUT_FOLDER), "/", "*.html") )
 
 # Mostres guardades en el fitxer per passar a l'empresa
-ls_dades_seccions_save <- ls_dades_seccions[nom_millors_mostres]
+ls_dades_seccions_save <- ls_dades_seccions[resum_millors_mostres$id_mostra]
 
 # Volem realitzar tants mapes com mostres hem guardat
 no_adj <- character()
@@ -92,7 +111,7 @@ for (i in 1:NMILLORMOSTRES){
     tm_borders (col = "blue" , lwd = 0.8)
   
   
-  tmap_save(t, paste0(file.path(PROJECT, DTA_OUTPUT_FOLDER), "/", i, "_mapa_csample", "_", nom_millors_mostres[i], ".html"))
+  tmap_save(t, paste0(file.path(PROJECT, DTA_OUTPUT_FOLDER), "/", i, "_mapa_csample", "_", resum_millors_mostres$id_mostra[i], ".html"))
   
   
   rm(list = c("sf_local_cat_copy", "sf_mostra_csample", "sf_adj1_no_boundary", "t"))
