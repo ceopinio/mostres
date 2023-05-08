@@ -5,8 +5,8 @@
 distinct_municipis <- numeric(NMOSTRES)
 # distància des del CEO a la seccio seleccionada en km en cotxe
 sum_distCEO_km_cotxe <- numeric(NMOSTRES)
-# temps des del CEO a la seccio seleccionada en hores en cotxe
-sum_tempsCEO_hores_cotxe <- numeric(NMOSTRES)
+# temps des del CEO a la seccio seleccionada en hores en cotxe (NO UTILITZAT)
+# sum_tempsCEO_hores_cotxe <- numeric(NMOSTRES) (NO UTILITZAT)
 # Creem una llista per guardar les diferencies electorals per partit per a cada mostra
 ls_p_csample <- vector(mode = "list", length = NMOSTRES)
 names(ls_p_csample) <- paste("mostra", 1:NMOSTRES, sep = "_")
@@ -48,7 +48,7 @@ for(i in 1:NMOSTRES){
   dades_seccions <- dades_seccions21
   
   # Elaboració dels clusters a partir de les columnes del data.frame finalitzades amb 21
-  # Per tal de tenir sempre la mateixa classificació de clústers, s'ha fixzat una llavor, 
+  # Per tal de tenir sempre la mateixa classificació de clústers, s'ha fixat una llavor, 
   # s'han guardat els resultats i es carreguen a partir del fitxer anomenat CUSEC_clusters.
   # Per obtenir els mateixos resultats, s'hauria d'aplicar les dues línies de codi següents:
   #set.seed(3456)
@@ -146,8 +146,8 @@ for(i in 1:NMOSTRES){
   
   # Distancia del CEO a la seccio seleccionada en km en cotxe
   sum_distCEO_km_cotxe[i] <- sum(csample$distancia_km_cotxe)
-  # temps desl del CEO a la seccio seleccionada en hores en cotxe
-  sum_tempsCEO_hores_cotxe[i] <- sum(csample$temps_hores_cotxe)
+  # temps desl del CEO a la seccio seleccionada en hores en cotxe (NO UTILITZAT)
+  # sum_tempsCEO_hores_cotxe[i] <- sum(csample$temps_hores_cotxe) (NO UTILITZAT)
   
   # Assignem valor 1 als municipis que han estat seleccionats
   csample$selected_csample <- 1
@@ -293,7 +293,7 @@ for(i in 1:NMOSTRES){
     sec_no_adj <- df_coord_sec[df_coord_sec$CUSEC == as.character( mostra_sense_adjacents[, c("CUSEC", "cluster21")][j,]["CUSEC"] ), ][c("CUSEC", "LONG", "LAT")]
     colnames(sec_no_adj) <- c("CUSEC_no_adj", "LONG_no_adj", "LAT_no_adj")
     
-    # Ajuntem les coordenades de les seccion possibles substitutes a les coordenades de la secció sense adjacencies
+    # Ajuntem les coordenades de les seccions possibles substitutes a les coordenades de la secció sense adjacencies
     df_mateix_cluster_no_csample <- cbind(df_mateix_cluster_no_csample, sec_no_adj)
     # Calculem la distància (en km) de cada coordenada de secció a la secció que estem buscant les seccions del mateix cluster més properes
     df_mateix_cluster_no_csample$distCUSEC_no_adj <- ( distHaversine(df_mateix_cluster_no_csample[,2:3], df_mateix_cluster_no_csample[,6:7]) ) / 1000.0
@@ -323,7 +323,7 @@ for(i in 1:NMOSTRES){
   info_sc_general[[i]] <- dades_seccions
   
   
-  ## BORREM ELEMENTS QUE HEM USAT DINS DEL LOOP. RESTAURAR VALORS PER INICIAR DE NOU EL LOOP
+  ## ESBORREM ELEMENTS QUE HEM USAT DINS DEL LOOP. RESTAURAR VALORS PER INICIAR DE NOU EL LOOP
   # cluster21 
   # resum_estrats_cluster
   # dades_seccions no s'hauria d'usar dins del loop --> crear una copia abans de iniciar el loop
