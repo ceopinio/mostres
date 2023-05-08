@@ -2,11 +2,11 @@
 
 ## Llibreries ---------------------------------------- 
 ## Paquets generals
-library(readr) #importació
-library(readxl) #importació excel
-library(stringr)
-library(tidyverse)
-library(yaml)
+library(readr) # importació
+library(readxl) # importació excel
+library(stringr) # string operations
+library(tidyverse) # use the different tidyverse packages
+library(yaml) # to read the yaml config
 
 ## Paquets específics
 library(pps) #mostres
@@ -16,29 +16,29 @@ library(modelsummary) # per fer les taules resum
 
 
 ## Paquets geografia
-library(sp)
-library(sf)
-library(rgdal) #to import shapefiles
-library(broom) #to convert shapefiles into the data frame structure we need
+library(sp) # for spatial data
+library(sf) # encode spatial vector data
+library(rgdal) # to import shapefiles
+library(broom) # to convert shapefiles into the data frame structure we need
 library(raster) # loads shapefile
-library(Rcpp)
+library(Rcpp) # integration of R and C++
 library(igraph) # build network
 library(spdep) # builds network
-library(spatialreg)
-library(tmap)
-library(tmaptools)
-library(spdep)
-library(rgeos)
-library(splitstackshape)
-library(geosphere) #to calculate distances
+library(spatialreg) # spatial regression analysis
+library(tmap) # for interactive maps
+library(tmaptools) # for interactive maps
+library(spdep) # for adjacent polygons
+library(rgeos) # geometries
+library(splitstackshape) # for spliting
+library(geosphere) # to calculate distances
 
-library(geojsonio)
-library(htmlwidgets)
-library(estimatr)
-library(RCT)
+library(geojsonio) # for converting data to geoJSON
+library(htmlwidgets) # javascript visualizations to R
+library(estimatr) # estimators for inference
+library(RCT) # for designing and evaluating experiments
 
 # Paquets tractament llistes
-library(purrr)
+library(purrr) # functional programming tools
 
 ## Llegim configuracio ---------------------------------------- 
 list2env(read_yaml("bop/config/config.yaml"), envir=globalenv())
@@ -248,13 +248,13 @@ caps_municipis_geo <- caps_municipis_geo %>%
   rename_with(tolower) %>% 
   mutate(
     distancia_km_cotxe = (as.numeric(distance) / 1000),
-    temps_hores_cotxe = (as.numeric(time) / 60) / 60,
+    # temps_hores_cotxe = (as.numeric(time) / 60) / 60, (NO UTILITZAT)
     cod_municipi = sprintf("%05.0f", codi.municipi.ine) )
 
 
 # Ajuntem la informació de distància en cotxe a les dades de les seccions censals
 dades_seccions21 <- dades_seccions21 %>% 
-  left_join(dplyr::select(caps_municipis_geo, cod_municipi, distancia_km_cotxe, temps_hores_cotxe),
+  left_join(dplyr::select(caps_municipis_geo, cod_municipi, distancia_km_cotxe) #, temps_hores_cotxe), (NO UTILITZAT)
             by = "cod_municipi")
 
 
