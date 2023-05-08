@@ -45,8 +45,8 @@ calcul_score <- function(x) {
 # sum_distCEO_h
 # # distància des del CEO a la seccio seleccionada en km en cotxe
 # sum_distCEO_km_cotxe 
-# # temps del del CEO a la seccio seleccionada en hores en cotxe
-# sum_tempsCEO_hores_cotxe
+# # temps del del CEO a la seccio seleccionada en hores en cotxe (NO UTILITZAT)
+# sum_tempsCEO_hores_cotxe (NO UTILITZAT)
 # # estadistics de la diferencia electoral
 # diff_electoral
 # # estadisitcs de la diferencia amb les variables sociodemogràfiques
@@ -94,10 +94,10 @@ df_all$end_score <- rowSums( dplyr::select(df_all, starts_with("score_")) )
 
 # Creem una nova puntualizació de cada mostra a partir dels diferents score obtinguts
 df_all$end_score_weights <- ( (0.2 * df_all$score_municipis) +
-                              (2 * df_all$score_distCEO_km_cotxe) +
-                              (0.2 * df_all$score_tempsCEO_hores_cotxe) +
-                              (1.3 * df_all$score_electoral) +
-                              (1.3 * df_all$score_sociodemografic) +
+                              (1.4 * df_all$score_distCEO_km_cotxe) +
+                              # (0.2 * df_all$score_tempsCEO_hores_cotxe) + (NO UTILITZAT)
+                              (1.2 * df_all$score_electoral) +
+                              (1.2 * df_all$score_sociodemografic) +
                               (1 * df_all$score_dist_provincies) )
 
 write_csv2(df_all, paste0(file.path(PROJECT, DTA_OUTPUT_FOLDER), "/mostres_resum_score.csv"))
