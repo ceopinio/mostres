@@ -94,7 +94,7 @@ for (i in 1:NMILLORMOSTRES){
       title = "Cluster",
       popup.vars = c(
         "Provincia" = "NPRO",
-        "Seccio: " = "CUSEC",
+        "CUSEC: " = "CUSEC",
         "Cluster" = "cluster21",
         "Substituta" = "adjacent_1"
       ),
