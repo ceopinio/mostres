@@ -254,7 +254,7 @@ caps_municipis_geo <- caps_municipis_geo %>%
 
 # Ajuntem la informació de distància en cotxe a les dades de les seccions censals
 dades_seccions21 <- dades_seccions21 %>% 
-  left_join(dplyr::select(caps_municipis_geo, cod_municipi, distancia_km_cotxe) #, temps_hores_cotxe), (NO UTILITZAT)
+  left_join(dplyr::select(caps_municipis_geo, cod_municipi, distancia_km_cotxe), # temps_hores_cotxe), (NO UTILITZAT)
             by = "cod_municipi")
 
 
