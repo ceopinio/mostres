@@ -65,7 +65,7 @@ diff_dist_prov <- as.numeric(colSums( abs(df_dist_provincies - dist_cens_prov$rP
 
 # Creacio resultats junts
 df_analisi_mostra <- data.frame(distinct_municipis, #sum_distCEO_h, tenim altres indicadors
-                                sum_distCEO_km_cotxe, sum_tempsCEO_hores_cotxe,
+                                sum_distCEO_km_cotxe, #sum_tempsCEO_hores_cotxe, (NO UTILITZAT)
                                 diff_electoral, diff_sociodemografic, #n_no_adjacents, ja no importa el nombre de no adjacences. S'ha automatitzat cerca.
                                 diff_dist_prov)
 
@@ -80,7 +80,7 @@ df_all <- df_analisi_mostra %>%
     score_municipis = calcul_score(distinct_municipis),
     #score_distCEO_h = calcul_score(sum_distCEO_h),
     score_distCEO_km_cotxe = calcul_score(sum_distCEO_km_cotxe),
-    score_tempsCEO_hores_cotxe = calcul_score(sum_tempsCEO_hores_cotxe),
+    #score_tempsCEO_hores_cotxe = calcul_score(sum_tempsCEO_hores_cotxe), (NO UTILITZAT)
     score_electoral = calcul_score(diff_electoral),
     score_sociodemografic = calcul_score(diff_sociodemografic),
     #score_no_adjacents = calcul_score(n_no_adjacents),
