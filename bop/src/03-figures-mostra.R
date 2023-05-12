@@ -42,7 +42,17 @@ openxlsx::write.xlsx(lapply(millors_mostres, function(x) dplyr::select(x, !(mean
 
 # Fitxer de les poblacions de la mostra amb menys de 10.000 habitants
 # Ja que s'avisa als ajuntaments de que hi haurà un inici de camp
-openxlsx::write.xlsx( lapply(millors_mostres, function(x) filter(x, pob_municipi < 10000)),
+
+# Primer creem una funció auxiliar per seleccionar només les variables que ens interessen 
+# dels municipis de menys de 10.000 habitants i per evitar repeticions
+agafar_poblacions_menys_10000h <- function(x){
+  x %>% 
+    dplyr::filter(pob_municipi < 10000) %>% 
+    dplyr::distinct(cod_municipi, .keep_all = TRUE) %>% 
+    dplyr::select(cod_municipi, nom_municipi, cod_comarca, nom_comarca, cod_provincia, nom_provincia, pob_municipi, mostra)
+}
+# Crear el fitxer amb les poblacions de menys de 10.000 habitants
+openxlsx::write.xlsx( lapply(millors_mostres, agafar_poblacions_menys_10000h),
                       paste0(file.path(PROJECT, DTA_OUTPUT_FOLDER), "/mostra_seccions_menys_10000_hab.xlsx") )
 
 # Fitxer dels resultats de la distibució dels partits i de les variables sociodemogràfiques pertinents de les mostres finals
