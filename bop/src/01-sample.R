@@ -227,7 +227,9 @@ for(i in 1:NMOSTRES){
     left_join(seccions_cluster,  by = c("CUSEC_mare" = "CUSEC")) %>%
     dplyr::select(CUSEC_mare, cluster_mare = cluster21.y, CUSEC_adj, adjacent, cluster_adj = cluster21.x) %>%
     # Ens quedem amb les seccions adjacents que pertanyen al mateix cluster que la secció mare
-    filter(cluster_mare == cluster_adj) %>%
+    # Es filtra ñes seccions censals que formen part de la mostra seleccionada, ja que no poden formar part com una adjacent
+    filter(cluster_mare == cluster_adj,
+           !CUSEC_adj %in% dades_seccions[dades_seccions$selected_csample == 1, ]$CUSEC) %>%
     # Creem un identificador per numerar en ordre les adjacents que son iguals
     getanID(id = "CUSEC_mare") %>% 
     # Canviem nom de la columna
