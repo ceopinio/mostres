@@ -43,6 +43,20 @@ library(purrr) # functional programming tools
 ## Llegim configuracio ---------------------------------------- 
 list2env(read_yaml("bop/config/config.yaml"), envir=globalenv())
 
+## Dades sobre les seccions censals ---------------------------------------- 
+df_sc <- read_excel(file.path(PROJECT, RAW_DTA_FOLDER, "dades_SC.xlsx"))
+df_sc_mostra <- df_sc |>
+  dplyr::select(CUSEC,
+                renda_neta_persona, #Atlas de distribución de renta de los hogares - INE 2020
+                renda_neta_llar, #Atlas de distribución de renta de los hogares - INE 2020
+                renda_bruta_llar, #Atlas de distribución de renta de los hogares - INE 2020
+                renda_bruta_persona, #Atlas de distribución de renta de los hogares - INE 2020
+                #data_demografics
+                edat_mitjana, perc_65_o_mes, #Censos de población i viviendas - INE 2021
+                #data_padro
+                poblacio, poblacio_municipi, #Censos de población i viviendas - INE 2021
+                #data_cluster
+                cluster21) # Cluster similitiud sociopolítica
 
 ## Dades electorals ---------------------------------------- 
 # Carreguem les dades electorals per secció de les últimes Elecccions al Parlament de Catalunya
@@ -82,66 +96,11 @@ A20211_Columnes_SE <- A20211_Columnes_SE %>%
 dades_seccions21 <- A20211_Columnes_SE
 
 
-## Dades renda ---------------------------------------- 
-# Carreguem els fitxer de dades per a cada província referent a la renda mitjana
-X30896 <- read_delim(file.path(PROJECT, RAW_DTA_FOLDER, "30896.csv"), "\t", escape_double = FALSE,  locale = locale(decimal_mark = ",", grouping_mark = "."),  trim_ws = TRUE)
-X31016 <- read_delim(file.path(PROJECT, RAW_DTA_FOLDER, "31016.csv"), "\t", escape_double = FALSE,  locale = locale(decimal_mark = ",", grouping_mark = "."),  trim_ws = TRUE)
-X31079 <- read_delim(file.path(PROJECT, RAW_DTA_FOLDER, "31079.csv"), "\t", escape_double = FALSE,  locale = locale(decimal_mark = ",", grouping_mark = "."),  trim_ws = TRUE)
-X31223 <- read_delim(file.path(PROJECT, RAW_DTA_FOLDER, "31223.csv"), "\t", escape_double = FALSE,  locale = locale(decimal_mark = ",", grouping_mark = "."),  trim_ws = TRUE)
-
-# Unim els quatre fitxer per tal d'obtenir conjunta la informació
-data_rendamitjana <- bind_rows(X30896, X31016, X31079, X31223)
-
-# Extreiem el codi que hi ha dins de la columna Unidades Territoriales
-data_rendamitjana$CUSEC <-  str_extract(data_rendamitjana$`Unidades territoriales`, "[[:digit:]]+")
-
-# Ens quedem només amb les seccions censals, i només amb el darrer any, les posem en columnes i deixen només el que necessitem
-# Passem les variables de renda a numeriques
-data_rendamitjana <- data_rendamitjana %>%
-  filter(nchar(CUSEC) == "10") %>%
-  filter(Periodo == PERIODE) %>%
-  pivot_wider(names_from = `Indicadores de renta media`, values_from = Total) %>%
-  dplyr::select(-`Unidades territoriales`,-Periodo) %>%
-  mutate(`Renta media por hogar` = as.numeric(gsub(".", "", `Renta media por hogar`, fixed = T)),
-         `Renta media por persona` = as.numeric(gsub(".", "", `Renta media por persona`, fixed = T)))
-
-
-## Dades demogràfiques --------------------------------------- 
-# Carreguem els fitxer de dades per a cada província referent a indicadors demogràfics
-X30904 <- read_delim(file.path(PROJECT, RAW_DTA_FOLDER, "30904.csv"), "\t", escape_double = FALSE, locale = locale(decimal_mark = ",", grouping_mark = "."), trim_ws = TRUE)
-X31024 <- read_delim(file.path(PROJECT, RAW_DTA_FOLDER, "31024.csv"), ";", escape_double = FALSE, locale = locale(decimal_mark = ",", grouping_mark = "."), trim_ws = TRUE)
-X31087 <- read_delim(file.path(PROJECT, RAW_DTA_FOLDER, "31087.csv"), "\t", escape_double = FALSE, locale = locale(decimal_mark = ",", grouping_mark = "."), trim_ws = TRUE)
-X31231 <- read_delim(file.path(PROJECT, RAW_DTA_FOLDER, "31231.csv"), "\t", escape_double = FALSE, locale = locale(decimal_mark = ",", grouping_mark = "."),  trim_ws = TRUE)
-
-# Canvis en el fitxer de dades X31024
-# Creem la variable que tenim als altres fitxers per poder-los unir
-X31024$Unidades_Territoriales <- ifelse( is.na(X31024$Secciones), (ifelse(is.na(X31024$Distritos), X31024$Municipios, X31024$Distritos ) ), X31024$Secciones )
-col_order <- c("Unidades_Territoriales", "Indicadores demográficos", "Periodo", "Total")
-X31024 <- X31024[, col_order]
-colnames(X31024) <- colnames(X30904)
-
-# Tractament de la variable Total perquè sigui numèrica i puguem fer la unio amb els altres fitxers
-X31024$Total <- as.numeric(gsub(",", ".", X31024$Total, fixed = T))
-
-# Unim els quatre fitxer per tal d'obtenir conjunta la informació
-data_demografics <- bind_rows(X30904, X31024, X31087, X31231)
-
-# Extreiem el codi CUSEC que hi ha dins de la columna Unidades Territoriales
-data_demografics$CUSEC <-  str_extract(data_demografics$`Unidades territoriales`, "[[:digit:]]+")
-
-# Ara ens quedem només amb les seccions, i només amb el darrer any, les posem en columnes i deixem només el que necessitem
-# A més, treiem els punts dels milers a la polblació perquè no els identifiqui com a decimals
-data_demografics <- data_demografics %>%
-  filter(nchar(CUSEC) == "10") %>%
-  filter(Periodo == PERIODE) %>%
-  pivot_wider(names_from = `Indicadores demográficos`, values_from = Total) %>%
-  dplyr::select(-`Unidades territoriales`,-Periodo) %>%
-  mutate(Población = as.numeric(gsub(".", "", Población, fixed = T)))
-
-
 ## Dades padro ---------------------------------------- 
 # Carreguem els fitxer de dades per a cada província referent a indicadors del padro continu d'habitants
+# Estadística del Padrón Continuo a 1 de enero de 2022. Datos por secciones censales
 # https://www.ine.es/dyngs/INEbase/es/operacion.htm?c=Estadistica_C&cid=1254736177012&menu=resultados&idp=1254734710990#!tabs-1254736195461
+# Descàrrega el 27/11/2023 
 X0805 <- read_delim(file.path(PROJECT, RAW_DTA_FOLDER, "0805.csv"), ";", escape_double = FALSE, locale = locale(decimal_mark = ",", grouping_mark = "."), trim_ws = TRUE)
 X1705 <- read_delim(file.path(PROJECT, RAW_DTA_FOLDER, "1705.csv"), ";", escape_double = FALSE,  locale = locale(decimal_mark = ",", grouping_mark = "."), trim_ws = TRUE)
 X2505 <- read_delim(file.path(PROJECT, RAW_DTA_FOLDER, "2505.csv"), ";", escape_double = FALSE,  locale = locale(decimal_mark = ",", grouping_mark = "."), trim_ws = TRUE)
@@ -176,8 +135,7 @@ data_municipi <- data_padro %>%
 # Ara unim a les dades de les eleccions, la informacio que tenim a renda mitjana, indicadors demografics i padro.
 # Les dades de referencia son els resultats de les eleccions, ja que és la variable dependent principal de la valoració política
 dades_seccions21 <- dades_seccions21 %>% 
-  left_join(data_rendamitjana, by = "CUSEC") %>% 
-  left_join(data_demografics, by = "CUSEC") %>% 
+  left_join(df_sc_mostra, by = "CUSEC") %>% 
   left_join(data_padro, by = "CUSEC") %>% 
   # Afegim la poblacio que té cada municipi
   left_join(data_municipi, by = "cod_municipi")
@@ -238,28 +196,15 @@ dades_seccions21 <- dades_seccions21 %>%
   left_join(df_coord_sec[, c("CUSEC", "distCEO_km_h")], by = "CUSEC")
 
 
-## Dades caps municipi ---------------------------------------- 
+## Dades distància municipi - CEO ---------------------------------------- 
 # Carreguem dades caps de municipis
 # Aquestes dades contenen la distància en km i temps des del CEO fins al cap de municipi en cotxe
 # time (in seconds) and travel distance (in meters) as metrics.
-caps_municipis_geo <- read_excel(file.path(PROJECT, RAW_DTA_FOLDER, "caps_municipis_geo2.xlsx"))
-
-caps_municipis_geo <- caps_municipis_geo %>%
-  rename_with(tolower) %>% 
-  mutate(
-    distancia_km_cotxe = (as.numeric(distance) / 1000),
-    # temps_hores_cotxe = (as.numeric(time) / 60) / 60, (NO UTILITZAT)
-    cod_municipi = sprintf("%05.0f", codi.municipi.ine) )
+data_distancia <- read_excel(file.path(PROJECT, RAW_DTA_FOLDER, "mpiscatalunya_complet.xlsx"))
 
 
 # Ajuntem la informació de distància en cotxe a les dades de les seccions censals
 dades_seccions21 <- dades_seccions21 %>% 
-  left_join(dplyr::select(caps_municipis_geo, cod_municipi, distancia_km_cotxe), # temps_hores_cotxe), (NO UTILITZAT)
+  left_join(dplyr::select(data_distancia, cod_municipi, distancia_km_cotxe),
             by = "cod_municipi")
-
-
-# Carreguem el resultat de kmeans dels clústers calculat anteriorment
-CUSEC_clusters <- read_csv(file.path(PROJECT, RAW_DTA_FOLDER, "CUSEC_clusters.csv"))
-dades_seccions21 <- dades_seccions21 %>% 
-  left_join(dplyr::select(CUSEC_clusters, CUSEC, cluster21), by = "CUSEC")
 

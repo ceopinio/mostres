@@ -22,6 +22,6 @@ Cal tenir en compte que en ser extraccions aleatòries, **el codi MAI reprodueix
 
 - `00-data_cleaning.R` llegeix diferents dades en brut que es transformen per tal de poder analitzar les característiques de les seccions censals i poder dibuixar els resultats en un mapa.
 - `01-sample.R` realita el mostreig aleatori estratificat. Els estrats són definits mitjançant l'algoritme _k-means_, identificant clústers per similitud electoral. En cada estrat, s'extreu una mostra de seccions censals proporcional al pes demogràfic de l'estrat. La probabilitat d'inclusió de cada secció a la mostra final és proporcional al cens de la secció. En l'script es guarden diferents fitxers per un futur ús o per a fer una anàlisi més exhaustiva.
-- `02-analysis.R` realitza una anàlisi dels resultats de la mostra. De cada estadístic que es vol que s'ajusti als valors poblacionals, es fa una puntuació a partir del nombre de mostres extretes. La mostra que tingui es classifiqui millor de totes les mostres, és l'escollida per realitzar l'enquesta.
+- `02-analysis.R` realitza una anàlisi dels resultats de la mostra. De cada estadístic que es vol que s'ajusti als valors poblacionals, es fa una puntuació a partir del nombre de mostres extretes. La mostra que tingui millor classificació (menor puntuació), és l'escollida per realitzar l'enquesta.
 - `03-figures-mostra.R` extreu la informació necessària perquè es duguin a terme les enquestes i es dibuixa en el mapa les seccions censals escollides.
 

@@ -37,6 +37,7 @@ openxlsx::write.xlsx(repeticions, paste0(file.path(PROJECT, DTA_OUTPUT_FOLDER), 
 
 # Fitxer que necessita l'empresa per realitzar el treball de camp.
 # Es passa un forquilla del nombre d'entrevistes que han de fer.
+names(millors_mostres) <- paste0(names(millors_mostres), "_onada_", 1:NMILLORMOSTRES)
 openxlsx::write.xlsx(lapply(millors_mostres, function(x) dplyr::select(x, !(mean_enquestes))),
                      paste0(file.path(PROJECT, DTA_OUTPUT_FOLDER), "/mostra_seccions.xlsx"))
 
@@ -121,7 +122,8 @@ for (i in 1:NMILLORMOSTRES){
     tm_borders (col = "blue" , lwd = 0.8)
   
   
-  tmap_save(t, paste0(file.path(PROJECT, DTA_OUTPUT_FOLDER), "/", i, "_mapa_csample", "_", resum_millors_mostres$id_mostra[i], ".html"))
+  tmap_save(t, paste0(file.path(PROJECT, DTA_OUTPUT_FOLDER), "/", i, "_mapa_csample", "_", 
+                      resum_millors_mostres$id_mostra[i], "_onada_", i, ".html"))
   
   
   rm(list = c("sf_local_cat_copy", "sf_mostra_csample", "sf_adj1_no_boundary", "t"))

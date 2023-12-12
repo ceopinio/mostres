@@ -1,12 +1,9 @@
+
 ## Configuracio abans loop ---------------------------------------- 
 
 # Variables que guardem de cada extracció de mostra: 
 # nombre diferents de municipis que toca visitar
 distinct_municipis <- numeric(NMOSTRES)
-# distància des del CEO a la seccio seleccionada en km en cotxe
-sum_distCEO_km_cotxe <- numeric(NMOSTRES)
-# temps des del CEO a la seccio seleccionada en hores en cotxe (NO UTILITZAT)
-# sum_tempsCEO_hores_cotxe <- numeric(NMOSTRES) (NO UTILITZAT)
 # Creem una llista per guardar les diferencies electorals per partit per a cada mostra
 ls_p_csample <- vector(mode = "list", length = NMOSTRES)
 names(ls_p_csample) <- paste("mostra", 1:NMOSTRES, sep = "_")
@@ -49,7 +46,7 @@ for(i in 1:NMOSTRES){
   
   # Elaboració dels clusters a partir de les columnes del data.frame finalitzades amb 21
   # Per tal de tenir sempre la mateixa classificació de clústers, s'ha fixat una llavor, 
-  # s'han guardat els resultats i es carreguen a partir del fitxer anomenat CUSEC_clusters.
+  # s'han guardat els resultats i es carreguen a partir del fitxer dades_SC.xlsx
   # Per obtenir els mateixos resultats, s'hauria d'aplicar les dues línies de codi següents:
   #set.seed(3456)
   #cluster21 <- kmeans(dplyr::select(dades_seccions21, ends_with("21")), centers = 6, nstart = 50, iter.max = 30)
@@ -145,7 +142,7 @@ for(i in 1:NMOSTRES){
   distinct_municipis[i] <- n_distinct(csample$cod_municipi)
   
   # Distancia del CEO a la seccio seleccionada en km en cotxe
-  sum_distCEO_km_cotxe[i] <- sum(csample$distancia_km_cotxe)
+  # sum_distCEO_km_cotxe[i] <- sum(csample$distancia_km_cotxe) (NO UTILITZAT)
   # temps desl del CEO a la seccio seleccionada en hores en cotxe (NO UTILITZAT)
   # sum_tempsCEO_hores_cotxe[i] <- sum(csample$temps_hores_cotxe) (NO UTILITZAT)
   
@@ -190,8 +187,8 @@ for(i in 1:NMOSTRES){
   # Guardem sortida en txt de la distribució variables sociodemogràfiques
   datasummary_balance(~ selected_csample,
                       data = dplyr::select(dades_seccions,
-                                           selected_csample, `Edad media de la población`, `Porcentaje de población de 65 y más años`, 
-                                           `Renta media por hogar`, pct_restaestat, pct_extranger),
+                                           selected_csample, edat_mitjana, perc_65_o_mes, 
+                                           renda_neta_llar, pct_restaestat, pct_extranger),
                       output=paste0(file.path(PROJECT, DTA_OUTPUT_FOLDER), "/taula_sd_csample.txt"), dinm_statistic = "p.value", fmt =  '%.3f')
   
   df_sd_csample <- read.table(paste0(file.path(PROJECT, DTA_OUTPUT_FOLDER), "/taula_sd_csample.txt"), header = F, skip = 2, sep = "|", dec = ".")
@@ -227,7 +224,7 @@ for(i in 1:NMOSTRES){
     left_join(seccions_cluster,  by = c("CUSEC_mare" = "CUSEC")) %>%
     dplyr::select(CUSEC_mare, cluster_mare = cluster21.y, CUSEC_adj, adjacent, cluster_adj = cluster21.x) %>%
     # Ens quedem amb les seccions adjacents que pertanyen al mateix cluster que la secció mare
-    # Es filtra ñes seccions censals que formen part de la mostra seleccionada, ja que no poden formar part com una adjacent
+    # Es filtra les seccions censals que formen part de la mostra seleccionada, ja que no poden formar part com una adjacent
     filter(cluster_mare == cluster_adj,
            !CUSEC_adj %in% dades_seccions[dades_seccions$selected_csample == 1, ]$CUSEC) %>%
     # Creem un identificador per numerar en ordre les adjacents que son iguals

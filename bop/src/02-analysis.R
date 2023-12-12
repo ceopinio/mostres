@@ -45,8 +45,6 @@ calcul_score <- function(x) {
 # sum_distCEO_h
 # # distància des del CEO a la seccio seleccionada en km en cotxe
 # sum_distCEO_km_cotxe 
-# # temps del del CEO a la seccio seleccionada en hores en cotxe (NO UTILITZAT)
-# sum_tempsCEO_hores_cotxe (NO UTILITZAT)
 # # estadistics de la diferencia electoral
 # diff_electoral
 # # estadisitcs de la diferencia amb les variables sociodemogràfiques
@@ -65,7 +63,6 @@ diff_dist_prov <- as.numeric(colSums( abs(df_dist_provincies - dist_cens_prov$rP
 
 # Creacio resultats junts
 df_analisi_mostra <- data.frame(distinct_municipis, #sum_distCEO_h, tenim altres indicadors
-                                sum_distCEO_km_cotxe, #sum_tempsCEO_hores_cotxe, (NO UTILITZAT)
                                 diff_electoral, diff_sociodemografic, #n_no_adjacents, ja no importa el nombre de no adjacences. S'ha automatitzat cerca.
                                 diff_dist_prov)
 
@@ -78,9 +75,6 @@ df_all <- df_analisi_mostra %>%
     ## Millor mostra aquella que te un score baix
     ## Per als valors repetits no es penalitza puntuació
     score_municipis = calcul_score(distinct_municipis),
-    #score_distCEO_h = calcul_score(sum_distCEO_h),
-    score_distCEO_km_cotxe = calcul_score(sum_distCEO_km_cotxe),
-    #score_tempsCEO_hores_cotxe = calcul_score(sum_tempsCEO_hores_cotxe), (NO UTILITZAT)
     score_electoral = calcul_score(diff_electoral),
     score_sociodemografic = calcul_score(diff_sociodemografic),
     #score_no_adjacents = calcul_score(n_no_adjacents),
@@ -93,14 +87,12 @@ df_all <- df_analisi_mostra %>%
 df_all$end_score <- rowSums( dplyr::select(df_all, starts_with("score_")) )
 
 # Creem una nova puntualizació de cada mostra a partir dels diferents score obtinguts
-df_all$end_score_weights <- ( (0.2 * df_all$score_municipis) +
-                              (1.4 * df_all$score_distCEO_km_cotxe) +
-                              # (0.2 * df_all$score_tempsCEO_hores_cotxe) + (NO UTILITZAT)
+df_all$end_score_weights <- ( (0.4 * df_all$score_municipis) +
                               (1.2 * df_all$score_electoral) +
                               (1.2 * df_all$score_sociodemografic) +
-                              (1 * df_all$score_dist_provincies) )
+                              (1.2 * df_all$score_dist_provincies) )
 
-write_csv2(df_all, paste0(file.path(PROJECT, DTA_OUTPUT_FOLDER), "/mostres_resum_score.csv"))
+openxlsx::write.xlsx(df_all, paste0(file.path(PROJECT, DTA_OUTPUT_FOLDER), "/mostres_resum_score.xlsx"))
 
 
 # Resum estadístics i nivells de confiança
@@ -115,4 +107,6 @@ IC_estadistic <- data.frame(
   nsim = nrow(df_analisi_mostra)
 )
 
-write_csv2(IC_estadistic, paste0(file.path(PROJECT, DTA_OUTPUT_FOLDER), "/mostres_estadistics_ic.csv"))
+openxlsx::write.xlsx(IC_estadistic, paste0(file.path(PROJECT, DTA_OUTPUT_FOLDER), "/mostres_estadistics_ic.xlsx"))
+
+
